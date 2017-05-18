@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Net;
@@ -11,27 +12,44 @@ namespace TCPClient
     {
         static void Main(string[] args)
         {
-            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try // 1
+            try
             {
-                s.Connect(IPAddress.Parse("127.0.0.1"), 6666); // 2
-                while (true)
-                {
-                    Communicate(s);
-                }
+                //Console.WriteLine("Multi-Threaded TCP Server Demo");
+                //Console.WriteLine("Provide IP:");
+                //String ip = Console.ReadLine();
+                string ip = "127.0.0.1";
+
+                //Console.WriteLine("Provide Port:");
+                //int port = Int32.Parse(Console.ReadLine());
+                int port = 8888;
+                Client client = new Client(ip, port);
             }
-            catch(Exception ex)
+
+            catch (Exception e)
             {
-                // nepripojeno
+                Console.WriteLine("Error..... " + e.StackTrace);
+                Console.ReadKey();
             }
         }
 
-        private static void Communicate(Socket socket)
+        private static void Communicate(TcpClient tcpClient)
         {
-            Console.Write("Zadej nejakej text : ");
-            string q = Console.ReadLine();                 // 3
-            byte[] data = Encoding.Default.GetBytes(q);    // 3
-            socket.Send(data);
+            Console.Write("Enter the string to be transmitted : ");
+
+            String str = Console.ReadLine();
+            Stream stm = tcpClient.GetStream();
+
+            ASCIIEncoding asen = new ASCIIEncoding();
+            byte[] ba = asen.GetBytes(str);
+            Console.WriteLine("Transmitting.....");
+
+            stm.Write(ba, 0, ba.Length);
+
+            byte[] bb = new byte[100];
+            int k = stm.Read(bb, 0, 100);
+
+            for (int i = 0; i < k; i++)
+                Console.Write(Convert.ToChar(bb[i]));
         }
     }
 }

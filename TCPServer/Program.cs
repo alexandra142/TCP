@@ -13,15 +13,15 @@ namespace TCPServer
         static byte[] data;  // 1
         static void Main(string[] args)
         {
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // 2
-            socket.Bind(new IPEndPoint(IPAddress.Any, 6666)); // 3
-            socket.Listen(10); // 4
-
-            while (true)
+            try
             {
-                Socket accepteddata = socket.Accept(); // 5
-                data = new byte[accepteddata.SendBufferSize]; // 6
-                Listen(accepteddata);
+                Console.WriteLine("Multi-Threaded TCP Server Demo");
+                Server server = new Server(8888);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error..... " + e.StackTrace);
+                Console.ReadKey();
             }
         }
 
