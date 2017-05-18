@@ -10,41 +10,46 @@ namespace TCPClient
 {
     class Client
     {
-        private TcpClient _client;
+        private readonly TcpClient _client;
 
-        private StreamReader _sReader;
-        private StreamWriter _sWriter;
-
-        private Boolean _isConnected;
-
-        public Client(String ipAddress, int portNum)
+        public Client(string ipAddress, int portNum)
         {
-            _client = new TcpClient();
-            _client.Connect(ipAddress, portNum);
+            try
+            {
+                _client = new TcpClient();
+                _client.Connect(ipAddress, portNum);
+                Console.WriteLine($"Connected to {ipAddress}");
 
-            HandleCommunication();
+                HandleCommunication();
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine(!_client.Connected ? $"disconnected from {_client.Client.RemoteEndPoint} ." : ex.Message);
+                Console.ReadKey();
+            }
         }
 
         public void HandleCommunication()
         {
-            _sReader = new StreamReader(_client.GetStream(), Encoding.ASCII);
-            _sWriter = new StreamWriter(_client.GetStream(), Encoding.ASCII);
+            StreamReader streamReader = new StreamReader(_client.GetStream(), Encoding.ASCII);
+            StreamWriter streamWriter = new StreamWriter(_client.GetStream(), Encoding.ASCII);
 
-            _isConnected = true;
-            String sData = null;
-            while (_isConnected)
+            while (_client.Connected)
             {
-                sData = Console.ReadLine();
-
-                // write data and make sure to flush, or the buffer will continue to 
-                // grow, and your data might not be sent when you want it, and will
-                // only be sent once the buffer is filled.
-                _sWriter.WriteLine(sData);
-                _sWriter.Flush();
-
-                // if you want to receive anything
-                // String sDataIncomming = _sReader.ReadLine();
+                Communicate(streamReader, streamWriter);
             }
+        }
+
+        private void Communicate(StreamReader streamReader, StreamWriter streamWriter)
+        {
+            var sData = Console.ReadLine();
+
+            streamWriter.WriteLine(sData);
+            streamWriter.Flush();
+
+            string sDataIncomming = streamReader.ReadLine();
+            Console.WriteLine(sDataIncomming);
         }
     }
 }
+

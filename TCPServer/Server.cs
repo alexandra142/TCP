@@ -27,14 +27,13 @@ namespace TCPServer
 
         public void LoopClients()
         {
+            Console.WriteLine("Wait for client connection");
             while (_isRunning)
             {
-                // wait for client connection
                 TcpClient newClient = _server.AcceptTcpClient();
+                Console.WriteLine($"{newClient.Client.RemoteEndPoint} Connected");
 
-                // client found.
-                // create a thread to handle communication
-                Thread t = new Thread(new ParameterizedThreadStart(HandleClient));
+                Thread t = new Thread(HandleClient);
                 t.Start(newClient);
             }
         }
@@ -45,25 +44,27 @@ namespace TCPServer
             TcpClient client = (TcpClient)obj;
 
             // sets two streams
-            StreamWriter sWriter = new StreamWriter(client.GetStream(), Encoding.ASCII);
-            StreamReader sReader = new StreamReader(client.GetStream(), Encoding.ASCII);
+            StreamReader streamReader = new StreamReader(client.GetStream(), Encoding.ASCII);
+            StreamWriter streamWriter = new StreamWriter(client.GetStream(), Encoding.ASCII);
             // you could use the NetworkStream to read and write, 
             // but there is no forcing flush, even when requested
 
-            Boolean bClientConnected = true;
-            String sData = null;
-
-            while (bClientConnected)
+            while (_isRunning && client.Connected)
             {
-                // reads from stream
-                sData = sReader.ReadLine();
+                try
+                {
+                    var sData = streamReader.ReadLine();
 
-                // shows content on the console.
-                Console.WriteLine($"Client {client.Client.RemoteEndPoint} {sData} ");
+                    // shows content on the console.
+                    Console.WriteLine($"Client {client.Client.RemoteEndPoint} {sData} ");
 
-                // to write something back.
-                // sWriter.WriteLine("Meaningfull things here");
-                // sWriter.Flush();
+                    streamWriter.WriteLine("Message accepted.");
+                    streamWriter.Flush();
+                }
+                catch(IOException ex)
+                {
+                    Console.WriteLine(!client.Connected ? $"{client.Client.RemoteEndPoint} disconnected." : ex.Message);
+                }
             }
         }
     }

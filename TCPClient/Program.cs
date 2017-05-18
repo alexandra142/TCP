@@ -27,7 +27,7 @@ namespace TCPClient
 
             catch (Exception e)
             {
-                Console.WriteLine("Error..... " + e.StackTrace);
+                Console.WriteLine(e.Message);
                 Console.ReadKey();
             }
         }
