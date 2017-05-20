@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace TCPClient
     {
         private readonly TcpClient _client;
 
-        public Client(string ipAddress, int portNum)
+        public Client(IPAddress ipAddress, int portNum)
         {
             try
             {

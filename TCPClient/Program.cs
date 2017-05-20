@@ -14,15 +14,15 @@ namespace TCPClient
         {
             try
             {
+                //
                 //Console.WriteLine("Multi-Threaded TCP Server Demo");
                 //Console.WriteLine("Provide IP:");
                 //String ip = Console.ReadLine();
-                string ip = "127.0.0.1";
 
                 //Console.WriteLine("Provide Port:");
                 //int port = Int32.Parse(Console.ReadLine());
                 int port = 8888;
-                Client client = new Client(ip, port);
+                Client client = new Client(IPAddress.Any, port);
             }
 
             catch (Exception e)
