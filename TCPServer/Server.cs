@@ -7,18 +7,19 @@ using System.Threading;
 
 namespace TCPServer
 {
-    class Server
+    public class Server
     {
         private readonly TcpListener _server;
 
         public Server(int port)
         {
-            _server = new TcpListener(IPAddress.Any, port);
+            _server = new TcpListener(GetLocalIPAddress(), port);
             _server.Start();
+            Console.WriteLine("IP: "+_server.LocalEndpoint);
 
             LoopClients();
         }
-
+     
         public void LoopClients()
         {
             Console.WriteLine("Wait for client connection");
@@ -49,6 +50,7 @@ namespace TCPServer
                 {
                     var sData = streamReader.ReadLine();
 
+
                     // shows content on the console.
                     Console.WriteLine($"Client {client.Client.RemoteEndPoint} {sData} ");
 
@@ -60,6 +62,19 @@ namespace TCPServer
                     Console.WriteLine(!client.Connected ? $"{client.Client.RemoteEndPoint} disconnected." : ex.Message);
                 }
             }
+        }
+
+        private IPAddress GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip;
+                }
+            }
+            throw new Exception("Local IP Address Not Found!");
         }
     }
 }

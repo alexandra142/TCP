@@ -9,7 +9,8 @@ namespace TCPClient
     class Client
     {
         private readonly TcpClient _client;
-
+        private StreamReader _streamReader;
+        private StreamWriter _streamWriter;
         public Client(IPAddress ipAddress, int portNum)
         {
             try
@@ -29,25 +30,30 @@ namespace TCPClient
 
         public void HandleCommunication()
         {
-            StreamReader streamReader = new StreamReader(_client.GetStream(), Encoding.ASCII);
-            StreamWriter streamWriter = new StreamWriter(_client.GetStream(), Encoding.ASCII);
-
-            while (_client.Connected)
-            {
-                Communicate(streamReader, streamWriter);
-            }
+            _streamReader = new StreamReader(_client.GetStream(), Encoding.ASCII);
+            _streamWriter = new StreamWriter(_client.GetStream(), Encoding.ASCII);
         }
 
-        private void Communicate(StreamReader streamReader, StreamWriter streamWriter)
+        /// <summary>
+        /// Return accepted Data
+        /// </summary>
+        /// <param name="streamReader"></param>
+        /// <param name="streamWriter"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public string Communicate(string message)
         {
-            var sData = Console.ReadLine();
+            var sData = message;
 
-            streamWriter.WriteLine(sData);
-            streamWriter.Flush();
+            _streamWriter.WriteLine(sData);
+            _streamWriter.Flush();
 
-            string sDataIncomming = streamReader.ReadLine();
+            string sDataIncomming = _streamReader.ReadLine();
             Console.WriteLine(sDataIncomming);
+
+            return sDataIncomming;
         }
+        
     }
 }
 
