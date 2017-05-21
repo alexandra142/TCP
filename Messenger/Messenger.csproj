@@ -40,12 +40,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AcceptedMessage.cs" />
     <Compile Include="ClientMessages.cs" />
+    <Compile Include="MaxLenths.cs" />
+    <Compile Include="MessageService.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MessageDecoder.cs" />
+    <Compile Include="MessageSplitter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerMessageFactory.cs" />
-    <Compile Include="ServerMessagesCodes.cs" />
+    <Compile Include="ClientMessageCodes.cs" />
+    <Compile Include="ServerMessageCodes.cs" />
+    <Compile Include="StreamMessage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

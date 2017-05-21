@@ -4,16 +4,20 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Messenger;
+using TCPServer.Services;
 
 namespace TCPServer
 {
     public class Server
     {
+        private const int MilisecondTimeout = 1000;
         private readonly TcpListener _server;
 
         public Server(int port)
         {
             _server = new TcpListener(IPAddress.Any, port);
+            _server.Server.ReceiveTimeout = MilisecondTimeout;
+            _server.Server.SendTimeout = MilisecondTimeout;
             StartServer();
 
             LoopClients();
@@ -61,13 +65,14 @@ namespace TCPServer
         {
             try
             {
-                streamMessage.ReadMessage();
+                streamMessage.ReadMessage("");
                 streamMessage.StreamWriter.WriteLine(streamMessage.AcceptedMessage.DecodedData);
                 streamMessage.StreamWriter.Flush();
             }
             catch (IOException ex)
             {
                 WriteError(ex, streamMessage.Client);
+                streamMessage.CloseClient();
             }
         }
 
@@ -83,18 +88,7 @@ namespace TCPServer
 
         private void StartCommunication(StreamMessage streamMessage)
         {
-            TryLogIn(streamMessage);
-        }
-
-        private void TryLogIn(StreamMessage streamMessage)
-        {
-            //Todo nema sa zo sprav odstranit \n ked je to WriteLine?
-            string logInChallenge = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_USER);
-            streamMessage.StreamWriter.WriteLine(logInChallenge);
-            streamMessage.StreamWriter.Flush();
-
-            streamMessage.AcceptedMessage.RestData += streamMessage.StreamReader.ReadLine();
-            streamMessage.AcceptedMessage.Decode();
+            LoginService.TryLogIn(streamMessage);
         }
 
         //private IPAddress GetLocalIPAddress()
