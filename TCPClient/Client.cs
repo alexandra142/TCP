@@ -27,33 +27,29 @@ namespace TCPClient
                 Console.ReadKey();
             }
         }
-
+     
         public void HandleCommunication()
         {
             _streamReader = new StreamReader(_client.GetStream(), Encoding.ASCII);
             _streamWriter = new StreamWriter(_client.GetStream(), Encoding.ASCII);
+            while (true)
+            {
+                Communicate();
+            }
         }
-
-        /// <summary>
-        /// Return accepted Data
-        /// </summary>
-        /// <param name="streamReader"></param>
-        /// <param name="streamWriter"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public string Communicate(string message)
+      
+        public string Communicate()
         {
-            var sData = message;
+            string sDataIncomming = _streamReader.ReadLine();
+            Console.WriteLine(sDataIncomming);
+
+            var sData = "Haf\r\n";
 
             _streamWriter.WriteLine(sData);
             _streamWriter.Flush();
 
-            string sDataIncomming = _streamReader.ReadLine();
-            Console.WriteLine(sDataIncomming);
-
             return sDataIncomming;
         }
-        
     }
 }
 

@@ -22,7 +22,7 @@ namespace TCPClient
                 //Console.WriteLine("Provide Port:");
                 //int port = Int32.Parse(Console.ReadLine());
                 int port = 8888;
-                Client client = new Client(IPAddress.Any, port);
+                Client client = new Client(GetLocalIPAddress(), port);
             }
 
             catch (Exception e)
@@ -30,6 +30,19 @@ namespace TCPClient
                 Console.WriteLine(e.Message);
                 Console.ReadKey();
             }
+        }
+
+        private static IPAddress GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip;
+                }
+            }
+            throw new Exception("Local IP Address Not Found!");
         }
     }
 }
