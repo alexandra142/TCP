@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Messenger
 {
-    internal static class Extensions
+    public static class Extensions
     {
         public static string GetEnumDescription(this Enum value)
         {
