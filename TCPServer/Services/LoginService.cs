@@ -10,36 +10,26 @@ namespace TCPServer.Services
         public static void TryLogIn(StreamMessage streamMessage)
         {
             GetUserName(streamMessage);
-            var validUsername = UserNameIsValid(streamMessage);
             string expectedPassword = GetExpectedPassword(streamMessage); 
 
             GetPassword(streamMessage);
            
-            SendRespond(validUsername, expectedPassword,streamMessage);
-        }
-
-        private static string GetExpectedPassword(StreamMessage streamMessage)
-        {
-            return (streamMessage.AcceptedMessage.AsciiValues.Sum() - 23).ToString();
+            SendRespond(expectedPassword,streamMessage);
         }
 
         private static void GetUserName(StreamMessage streamMessage)
         {
             MessageService.SendLoginChallenge(streamMessage);
+            ValidUserName(streamMessage);
         }
 
-        private static void GetPassword(StreamMessage streamMessage)
+        private static void ValidUserName(StreamMessage streamMessage)
         {
-            MessageService.SendPasswordChallenge(streamMessage);
+            if (UserNameIsValid(streamMessage)) return;
+
+            MessageService.SendLoginFailed(streamMessage);
         }
 
-        private static void SendRespond(bool validUserName, string expectedPassword, StreamMessage streamMessage)
-        {
-            if(!validUserName) MessageService.SendLoginFailed(streamMessage);
-            if (PasswordIsValid(expectedPassword, streamMessage)) MessageService.SendOk(streamMessage);
-            else MessageService.SendLoginFailed(streamMessage);
-        }
-     
         private static bool UserNameIsValid(StreamMessage streamMessage)
         {
             var userName = streamMessage.AcceptedMessage.DecodedData;
@@ -50,15 +40,43 @@ namespace TCPServer.Services
             return true;
         }
 
-        private static bool PasswordIsValid(string expectedPassword, StreamMessage streamMessage)
+        private static string GetExpectedPassword(StreamMessage streamMessage)
+        {
+            return streamMessage.AcceptedMessage.AsciiValues.Sum().ToString();
+        }
+
+        private static void GetPassword(StreamMessage streamMessage)
+        {
+            MessageService.SendPasswordChallenge(streamMessage);
+            ValidPassword(streamMessage);
+        }
+
+        private static void ValidPassword(StreamMessage streamMessage)
+        {
+            if(PasswordIsValid(streamMessage)) return;
+
+            MessageService.SendLoginFailed(streamMessage);
+        }
+
+        private static void SendRespond(string expectedPassword, StreamMessage streamMessage)
+        {
+            if (LoginIsValid(expectedPassword, streamMessage)) MessageService.SendOk(streamMessage);
+            else MessageService.SendLoginFailed(streamMessage);
+        }
+
+        private static bool LoginIsValid(string expectedPassword, StreamMessage streamMessage)
+        {
+            return expectedPassword == streamMessage.AcceptedMessage.DecodedData;
+        }
+
+        private static bool PasswordIsValid(StreamMessage streamMessage)
         {
             var password = streamMessage.AcceptedMessage.DecodedData;
             if (NoMessageDecoded(password)) return false;
             if (IsTooLong(streamMessage, MaxLenths.Password)) return false;
             if (!ContainsOnlyDigits(password)) return false;
-            if (expectedPassword == password) return true;
 
-            return false;
+            return true;
         }
 
         private static bool ContainsOnlyDigits(string password)

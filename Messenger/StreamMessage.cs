@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 
@@ -43,6 +44,12 @@ namespace Messenger
         {
             AcceptedMessage.AsciiValues.Clear();
             AcceptedMessage.DecodedData = string.Empty;
+        }
+
+        public void CloseClient()
+        {
+            Console.Write($"Client {Client.Client.RemoteEndPoint} closed");
+            Client.Close();
         }
     }
 }

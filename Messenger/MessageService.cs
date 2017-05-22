@@ -12,6 +12,7 @@
         {
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_LOGIN_FAILED);
             streamMessage.WriteMessage(message);
+            streamMessage.CloseClient();
         }
 
         public static void SendSyntaxError(StreamMessage streamMessage)

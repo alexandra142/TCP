@@ -72,7 +72,7 @@ namespace TCPServer
             catch (IOException ex)
             {
                 WriteError(ex, streamMessage.Client);
-                streamMessage.Client.Close();
+                streamMessage.CloseClient();
             }
         }
 
