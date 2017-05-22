@@ -49,36 +49,36 @@ namespace TCPServer
         private void HandleClient(object obj)
         {
             TcpClient client = (TcpClient)obj;
-
             StreamMessage streamMessage = new StreamMessage(client);
 
-            if (client.Connected)
-                StartCommunication(streamMessage);
-
-            while (client.Connected)
-            {
-                Communicate(streamMessage);
-            }
-        }
-
-        private void Communicate(StreamMessage streamMessage)
-        {
             try
             {
-                streamMessage.ReadMessage("");
-                streamMessage.StreamWriter.WriteLine(streamMessage.AcceptedMessage.DecodedData);
-                streamMessage.StreamWriter.Flush();
+                if (!client.Connected) return;
+
+                StartCommunication(streamMessage);
+                if (streamMessage.ClientClosed) return;
+
+                GetPositionMove(streamMessage);
+
+
             }
-            catch (IOException ex)
+            catch (IOException ioe)
             {
-                WriteError(ex, streamMessage.Client);
+                Console.WriteLine(ioe.Message);
+            }
+            catch (ObjectDisposedException ide)
+            {
+                Console.WriteLine(ide.Message);
+            }
+            finally
+            {
                 streamMessage.CloseClient();
             }
         }
 
-        private void WriteError(Exception ex, TcpClient client)
+        private void GetPositionMove(StreamMessage streamMessage)
         {
-            Console.WriteLine(!client.Connected ? $"{client.Client.RemoteEndPoint} disconnected." : ex.Message);
+            MoveService.TryMove(streamMessage);
         }
 
         private bool NetworkAvailable()

@@ -12,13 +12,13 @@
         {
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_LOGIN_FAILED);
             streamMessage.WriteMessage(message);
-            streamMessage.CloseClient();
         }
 
         public static void SendSyntaxError(StreamMessage streamMessage)
         {
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_SYNTAX_ERROR);
             streamMessage.WriteMessage(message);
+            streamMessage.CloseClient();
         }
 
         public static void SendLoginChallenge(StreamMessage streamMessage)
@@ -33,6 +33,13 @@
             string passwordChallenge = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_PASSWORD);
             streamMessage.WriteMessage(passwordChallenge);
             streamMessage.ReadMessage("Accepted Password");
+        }
+
+        public static void SendMoveChallenge(StreamMessage streamMessage)
+        {
+            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_MOVE);
+            streamMessage.WriteMessage(message);
+            streamMessage.ReadMessage("Moving");
         }
     }
 }

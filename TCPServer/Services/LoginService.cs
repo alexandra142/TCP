@@ -10,10 +10,15 @@ namespace TCPServer.Services
         public static void TryLogIn(StreamMessage streamMessage)
         {
             GetUserName(streamMessage);
+
+            if(streamMessage.ClientClosed) return;
+
             string expectedPassword = GetExpectedPassword(streamMessage); 
 
             GetPassword(streamMessage);
-           
+
+            if (streamMessage.ClientClosed) return;
+
             SendRespond(expectedPassword,streamMessage);
         }
 
@@ -27,14 +32,14 @@ namespace TCPServer.Services
         {
             if (UserNameIsValid(streamMessage)) return;
 
-            MessageService.SendLoginFailed(streamMessage);
+            MessageService.SendSyntaxError(streamMessage);
         }
 
         private static bool UserNameIsValid(StreamMessage streamMessage)
         {
             var userName = streamMessage.AcceptedMessage.DecodedData;
             if (NoMessageDecoded(userName)) return false;
-            if (IsTooLong(streamMessage, MaxLenths.Login)) return false;
+            if (MessageValidator.IsTooLong(streamMessage, MaxLenths.Login)) return false;
             if (BeginWithKeyWord(userName)) return false;
 
             return true;
@@ -42,7 +47,8 @@ namespace TCPServer.Services
 
         private static string GetExpectedPassword(StreamMessage streamMessage)
         {
-            return streamMessage.AcceptedMessage.AsciiValues.Sum().ToString();
+            var asciiSum = streamMessage.AcceptedMessage.AsciiValues.Sum()- Constants.SplitterAscii.Sum();
+            return asciiSum.ToString();
         }
 
         private static void GetPassword(StreamMessage streamMessage)
@@ -55,7 +61,7 @@ namespace TCPServer.Services
         {
             if(PasswordIsValid(streamMessage)) return;
 
-            MessageService.SendLoginFailed(streamMessage);
+            MessageService.SendSyntaxError(streamMessage);
         }
 
         private static void SendRespond(string expectedPassword, StreamMessage streamMessage)
@@ -73,7 +79,7 @@ namespace TCPServer.Services
         {
             var password = streamMessage.AcceptedMessage.DecodedData;
             if (NoMessageDecoded(password)) return false;
-            if (IsTooLong(streamMessage, MaxLenths.Password)) return false;
+            if (MessageValidator.IsTooLong(streamMessage, MaxLenths.Password)) return false;
             if (!ContainsOnlyDigits(password)) return false;
 
             return true;
@@ -82,11 +88,6 @@ namespace TCPServer.Services
         private static bool ContainsOnlyDigits(string password)
         {
             return password.All(char.IsDigit);
-        }
-
-        private static bool IsTooLong(StreamMessage streamMessage, int maxLength)
-        {
-            return streamMessage.AcceptedMessage.AsciiValues.Count > maxLength;
         }
 
         private static bool NoMessageDecoded(string decodedData)

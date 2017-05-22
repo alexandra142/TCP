@@ -6,7 +6,6 @@ namespace Messenger
     {
         public bool Splitted;
         private bool[] _splitterRecognized;
-        private static readonly int[] SplitterAscii = { 13, 10 };
 
         public MessageSplitter()
         {
@@ -60,8 +59,8 @@ namespace Messenger
 
         private int GetSplitterIndex(int value)
         {
-            for (int i = 0; i < SplitterAscii.Length; i++)
-                if (value == SplitterAscii[i])
+            for (int i = 0; i < Constants.SplitterAscii.Length; i++)
+                if (value == Constants.SplitterAscii[i])
                     return i;
 
             return -1;
@@ -69,9 +68,9 @@ namespace Messenger
 
         private void CreateSplitterRecognizedSymtpoms()
         {
-            _splitterRecognized = new bool[SplitterAscii.Length];
+            _splitterRecognized = new bool[Constants.SplitterAscii.Length];
 
-            for (int i = 0; i < SplitterAscii.Length; i++)
+            for (int i = 0; i < Constants.SplitterAscii.Length; i++)
                 _splitterRecognized[i] = false;
         }
     }

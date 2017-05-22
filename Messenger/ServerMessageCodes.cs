@@ -10,16 +10,16 @@ namespace Messenger
         [Description("101 PASSWORD")]
         SERVER_PASSWORD,
 
-        [Description("102 MOVE\r\n")]
+        [Description("102 MOVE")]
         SERVER_MOVE,
 
-        [Description("103 TURN LEFT\r\n")]
+        [Description("103 TURN LEFT")]
         SERVER_TURN_LEFT,
 
-        [Description("104 TURN RIGHT\r\n")]
+        [Description("104 TURN RIGHT")]
         SERVER_TURN_RIGHT,
 
-        [Description("105 GET MESSAGE\r\n")]
+        [Description("105 GET MESSAGE")]
         SERVER_PICK_UP,
 
         [Description("200 OK")]
@@ -28,7 +28,7 @@ namespace Messenger
         [Description("300 LOGIN FAILED")]
         SERVER_LOGIN_FAILED,
 
-        [Description("301 SYNTAX ERROR\r\n")]
+        [Description("301 SYNTAX ERROR")]
         SERVER_SYNTAX_ERROR,
 
         [Description("302 LOGIC ERROR\r\n")]

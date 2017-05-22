@@ -11,7 +11,7 @@ namespace Messenger
         public StreamReader StreamReader { get; set; }
         public StreamWriter StreamWriter { get; set; }
         public AcceptedMessage AcceptedMessage { get; set; }
-
+        public bool ClientClosed = false;
         public StreamMessage(TcpClient client)
         {
             Client = client;
@@ -26,7 +26,7 @@ namespace Messenger
             StreamWriter.WriteLine(message);
             StreamWriter.Flush();
         }
-       
+
         public void ReadMessage(string writeConsoleMessage)
         {
             ClearOldValues();
@@ -48,8 +48,18 @@ namespace Messenger
 
         public void CloseClient()
         {
-            Console.Write($"Client {Client.Client.RemoteEndPoint} closed");
-            Client.Close();
+            try
+            {
+                Console.Write($"Client {Client.Client.RemoteEndPoint} closed");
+                Client.Close();
+                StreamReader.Dispose();
+                StreamWriter.Dispose();
+                ClientClosed = true;
+            }
+            catch (ObjectDisposedException ode)
+            {
+                
+            }
         }
     }
 }
