@@ -4,56 +4,61 @@
     {
         public static void SendOk(StreamMessage streamMessage)
         {
-            string okMessage = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_OK);
-            streamMessage.WriteMessage(okMessage);
+            WriteMessage(streamMessage, ServerMessagesCodes.SERVER_OK);
         }
 
         public static void SendLoginFailed(StreamMessage streamMessage)
         {
-            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_LOGIN_FAILED);
-            streamMessage.WriteMessage(message);
+            WriteMessage(streamMessage, ServerMessagesCodes.SERVER_LOGIN_FAILED);
         }
 
         public static void SendSyntaxError(StreamMessage streamMessage)
         {
-            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_SYNTAX_ERROR);
-            streamMessage.WriteMessage(message);
+            WriteMessage(streamMessage, ServerMessagesCodes.SERVER_SYNTAX_ERROR);
+
             streamMessage.CloseClient();
         }
 
         public static void SendLoginChallenge(StreamMessage streamMessage)
         {
-            string logInChallenge = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_USER);
-            streamMessage.WriteMessage(logInChallenge);
-            streamMessage.ReadMessage("Accepted UserName");
+            SendMessage(streamMessage, ServerMessagesCodes.SERVER_USER, "Accepted userName");
         }
 
         public static void SendPasswordChallenge(StreamMessage streamMessage)
         {
-            string passwordChallenge = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_PASSWORD);
-            streamMessage.WriteMessage(passwordChallenge);
-            streamMessage.ReadMessage("Accepted Password");
+            SendMessage(streamMessage, ServerMessagesCodes.SERVER_PASSWORD, "Accepted password");
         }
 
         public static void SendMoveChallenge(StreamMessage streamMessage)
         {
-            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_MOVE);
-            streamMessage.WriteMessage(message);
-            streamMessage.ReadMessage("Moving");
+            SendMessage(streamMessage, ServerMessagesCodes.SERVER_MOVE, "Move");
         }
 
         public static void SendTurnRightChallenge(StreamMessage streamMessage)
         {
-            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_TURN_RIGHT);
-            streamMessage.WriteMessage(message);
-            streamMessage.ReadMessage("Turn right");
+            SendMessage(streamMessage, ServerMessagesCodes.SERVER_TURN_RIGHT, "Turn right");
         }
 
         public static void SendTurnLeftChallenge(StreamMessage streamMessage)
         {
-            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_TURN_LEFT);
+            SendMessage(streamMessage, ServerMessagesCodes.SERVER_TURN_LEFT, "Turn left");
+        }
+
+        public static void SendPickUpChallenge(StreamMessage streamMessage)
+        {
+            SendMessage(streamMessage, ServerMessagesCodes.SERVER_PICK_UP, "Pick up");
+        }
+
+        private static void SendMessage(StreamMessage streamMessage, ServerMessagesCodes messageCode, string consoleMessage)
+        {
+            WriteMessage(streamMessage, messageCode);
+            streamMessage.ReadMessage(consoleMessage);
+        }
+
+        private static void WriteMessage(StreamMessage streamMessage, ServerMessagesCodes messageCode)
+        {
+            string message = ServerMessageFactory.Create(messageCode);
             streamMessage.WriteMessage(message);
-            streamMessage.ReadMessage("Turn left");
         }
     }
 }

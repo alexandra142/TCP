@@ -59,6 +59,9 @@ namespace TCPServer
                 if (streamMessage.ClientClosed) return;
 
                 Move(streamMessage);
+                if (streamMessage.ClientClosed) return;
+
+                PickUpService.TryPickUp(streamMessage);
             }
             catch (IOException ioe)
             {

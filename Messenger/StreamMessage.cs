@@ -55,5 +55,10 @@ namespace Messenger
             StreamWriter.Dispose();
             ClientClosed = true;
         }
+
+        public string GetData()
+        {
+            return AcceptedMessage.DecodedData;
+        }
     }
 }
