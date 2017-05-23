@@ -49,6 +49,7 @@
     <Compile Include="Server.cs" />
     <Compile Include="Services\MoveService.cs" />
     <Compile Include="Services\LoginService.cs" />
+    <Compile Include="Services\OrientationRecogrition.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -57,6 +58,10 @@
     <ProjectReference Include="..\Messenger\Messenger.csproj">
       <Project>{3b1b1bbb-c975-4c8a-9687-bf939e3c3748}</Project>
       <Name>Messenger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Model\Model.csproj">
+      <Project>{14878ebf-3813-4100-b95d-f6692d569209}</Project>
+      <Name>Model</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

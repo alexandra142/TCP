@@ -1,20 +1,20 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using Model;
 
 namespace Messenger
 {
     public class StreamMessage
     {
-        public TcpClient Client { get; set; }
+        public ClientRobot Robot { get; set; }
         public StreamReader StreamReader { get; set; }
         public StreamWriter StreamWriter { get; set; }
         public AcceptedMessage AcceptedMessage { get; set; }
-        public bool ClientClosed = false;
+        public bool ClientClosed;
         public StreamMessage(TcpClient client)
         {
-            Client = client;
+            Robot = new ClientRobot {TcpClient = client};
             StreamReader = new StreamReader(client.GetStream(), Encoding.UTF8);
 
             StreamWriter = new StreamWriter(client.GetStream());
@@ -48,18 +48,12 @@ namespace Messenger
 
         public void CloseClient()
         {
-            try
-            {
-                Console.Write($"Client {Client.Client.RemoteEndPoint} closed");
-                Client.Close();
-                StreamReader.Dispose();
-                StreamWriter.Dispose();
-                ClientClosed = true;
-            }
-            catch (ObjectDisposedException ode)
-            {
-                
-            }
+            if (Robot.IsClosed) return;
+
+            Robot.Close();
+            StreamReader.Dispose();
+            StreamWriter.Dispose();
+            ClientClosed = true;
         }
     }
 }

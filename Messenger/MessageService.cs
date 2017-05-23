@@ -41,5 +41,19 @@
             streamMessage.WriteMessage(message);
             streamMessage.ReadMessage("Moving");
         }
+
+        public static void SendTurnRightChallenge(StreamMessage streamMessage)
+        {
+            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_TURN_RIGHT);
+            streamMessage.WriteMessage(message);
+            streamMessage.ReadMessage("Turn right");
+        }
+
+        public static void SendTurnLeftChallenge(StreamMessage streamMessage)
+        {
+            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_TURN_LEFT);
+            streamMessage.WriteMessage(message);
+            streamMessage.ReadMessage("Turn left");
+        }
     }
 }

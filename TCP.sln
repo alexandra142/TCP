@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPServer", "TCPServer\TCPS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger", "Messenger\Messenger.csproj", "{3B1B1BBB-C975-4C8A-9687-BF939E3C3748}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{14878EBF-3813-4100-B95D-F6692D569209}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3B1B1BBB-C975-4C8A-9687-BF939E3C3748}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B1B1BBB-C975-4C8A-9687-BF939E3C3748}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B1B1BBB-C975-4C8A-9687-BF939E3C3748}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14878EBF-3813-4100-B95D-F6692D569209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14878EBF-3813-4100-B95D-F6692D569209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14878EBF-3813-4100-B95D-F6692D569209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14878EBF-3813-4100-B95D-F6692D569209}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -40,7 +40,7 @@ namespace TCPServer
         private void WaitForClient()
         {
             TcpClient newClient = _server.AcceptTcpClient();
-            Console.WriteLine($"{newClient.Client.RemoteEndPoint} Connected");
+            Console.WriteLine($"\n***********{newClient.Client.RemoteEndPoint} Connected************");
 
             Thread t = new Thread(HandleClient);
             t.Start(newClient);
@@ -58,9 +58,7 @@ namespace TCPServer
                 StartCommunication(streamMessage);
                 if (streamMessage.ClientClosed) return;
 
-                GetPositionMove(streamMessage);
-
-
+                Move(streamMessage);
             }
             catch (IOException ioe)
             {
@@ -76,9 +74,9 @@ namespace TCPServer
             }
         }
 
-        private void GetPositionMove(StreamMessage streamMessage)
+        private void Move(StreamMessage streamMessage)
         {
-            MoveService.TryMove(streamMessage);
+            MoveService.TryMoveToGoal(streamMessage);
         }
 
         private bool NetworkAvailable()
