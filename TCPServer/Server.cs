@@ -53,13 +53,12 @@ namespace TCPServer
             ClientRobot robot = new ClientRobot { TcpClient = client };
             try
             {
-                if (!client.Connected) return;
-                if (!LoginService.TryLogIn(streamMessage, robot)) return;
+                Communicate(streamMessage, robot);
+                while (!robot.IsClosed)
+                {
+                    streamMessage.ReadMessage("something: ");
+                }
 
-                MoveService.TryMoveToGoal(streamMessage, robot);
-                if (robot.IsClosed) return;
-
-                PickUpService.TryPickUp(streamMessage, robot);
             }
             catch (IOException ioe)
             {
@@ -75,31 +74,20 @@ namespace TCPServer
             }
         }
 
-        private void Move(StreamMessage streamMessage)
+        private void Communicate(StreamMessage streamMessage, ClientRobot robot)
         {
+            if (robot.IsClosed) return;
+            if (!LoginService.TryLogIn(streamMessage, robot)) return;
 
+            MoveService.TryMoveToGoal(streamMessage, robot);
+            if (robot.IsClosed) return;
+
+            PickUpService.TryPickUp(streamMessage, robot);
         }
 
         private bool NetworkAvailable()
         {
             return System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable();
         }
-
-        private void StartCommunication(StreamMessage streamMessage)
-        {
-        }
-
-        //private IPAddress GetLocalIPAddress()
-        //{
-        //    var host = Dns.GetHostEntry(Dns.GetHostName());
-        //    foreach (var ip in host.AddressList)
-        //    {
-        //        if (ip.AddressFamily == AddressFamily.InterNetwork)
-        //        {
-        //            return ip;
-        //        }
-        //    }
-        //    throw new Exception("Local IP Address Not Found!");
-        //}
     }
 }

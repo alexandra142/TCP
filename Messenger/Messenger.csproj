@@ -46,7 +46,6 @@
     <Compile Include="MaxLenths.cs" />
     <Compile Include="MessageService.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="MessageDecoder.cs" />
     <Compile Include="MessageSplitter.cs" />
     <Compile Include="MessageValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

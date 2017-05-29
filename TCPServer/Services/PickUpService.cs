@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Messenger;
+﻿using Messenger;
 using Model;
 
 namespace TCPServer.Services
