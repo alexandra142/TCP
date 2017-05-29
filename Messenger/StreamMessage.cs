@@ -7,14 +7,12 @@ namespace Messenger
 {
     public class StreamMessage
     {
-        public ClientRobot Robot { get; set; }
         public StreamReader StreamReader { get; set; }
         public StreamWriter StreamWriter { get; set; }
         public AcceptedMessage AcceptedMessage { get; set; }
         public bool ClientClosed;
         public StreamMessage(TcpClient client)
         {
-            Robot = new ClientRobot {TcpClient = client};
             StreamReader = new StreamReader(client.GetStream(), Encoding.UTF8);
 
             StreamWriter = new StreamWriter(client.GetStream());
@@ -51,11 +49,11 @@ namespace Messenger
             AcceptedMessage.DecodedData = string.Empty;
         }
 
-        public void CloseClient()
+        public void CloseClient(ClientRobot robot)
         {
-            if (Robot.IsClosed) return;
+            if (robot.IsClosed) return;
 
-            Robot.Close();
+            robot.Close();
             StreamReader.Dispose();
             StreamWriter.Dispose();
             ClientClosed = true;

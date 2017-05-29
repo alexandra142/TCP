@@ -1,4 +1,6 @@
-﻿namespace Messenger
+﻿using Model;
+
+namespace Messenger
 {
     public static class MessageService
     {
@@ -14,18 +16,18 @@
             streamMessage.WriteMessage(message);
         }
 
-        public static void SendSyntaxError(StreamMessage streamMessage)
+        public static void SendSyntaxError(StreamMessage streamMessage, ClientRobot robot)
         {
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_SYNTAX_ERROR);
             streamMessage.WriteMessage(message);
-            streamMessage.CloseClient();
+            streamMessage.CloseClient(robot);
         }
 
         public static void SendLoginChallenge(StreamMessage streamMessage)
         {
             string logInChallenge = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_USER);
             streamMessage.WriteMessage(logInChallenge);
-            streamMessage.ReadMessage("Accepted UserName",MaxLenths.Login);
+            streamMessage.ReadMessage("Accepted UserName", MaxLenths.Login);
         }
 
         public static void SendPasswordChallenge(StreamMessage streamMessage)

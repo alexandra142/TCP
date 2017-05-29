@@ -6,111 +6,115 @@ namespace TCPServer.Services
 {
     public static class MoveService
     {
-        public static void TryMoveToGoal(StreamMessage streamMessage)
+        public static bool TryMoveToGoal(StreamMessage streamMessage, ClientRobot robot)
         {
-            streamMessage.Robot.Orientation = GetOrientation(streamMessage);
-            Position position = GetPosition(streamMessage);
-            TurnToXAxis(streamMessage, position);
-            GetToXAxis(streamMessage, position);
-            TurnToYAxis(streamMessage, position);
-            GetToGoal(streamMessage, position);
+            SetOrientationToRobot(streamMessage, robot);
+            TurnToXAxis(streamMessage, robot);
+            GetToXAxis(streamMessage, robot);
+            TurnToYAxis(streamMessage, robot);
+            GetToYAxis(streamMessage, robot);
+
+            return robot.Position.X == 0 && robot.Position.Y == 0;
         }
 
-        private static Orientation GetOrientation(StreamMessage streamMessage)
+        private static void SetOrientationToRobot(StreamMessage streamMessage, ClientRobot robot)
         {
-            Move(streamMessage);
-            var positionA = GetPosition(streamMessage);
+            Move(streamMessage, robot);
+            var positionA = GetPositionSetToRobot(streamMessage, robot);
 
-            Move(streamMessage);
-            var positionB = GetPosition(streamMessage);
+            Move(streamMessage, robot);
+            var positionB = GetPositionSetToRobot(streamMessage, robot);
 
-            return OrientationRecogrition.Recognize(positionA, positionB);
+            robot.Orientation = OrientationRecogrition.Recognize(positionA, positionB);
         }
 
-        private static Position GetPosition(StreamMessage streamMessage)
+        private static Position GetPositionSetToRobot(StreamMessage streamMessage, ClientRobot robot)
         {
             var data = streamMessage.AcceptedMessage.DecodedData.Split(' ');
 
             int x = GetPositionInt(data[1]);
             int y = GetPositionInt(data[2]);
 
-            var position = new Position(x, y);
+            robot.Position = new Position(x, y);
 
-            return position;
+            return robot.Position;
         }
 
-        private static void TurnToXAxis(StreamMessage streamMessage, Position position)
+        private static void TurnToXAxis(StreamMessage streamMessage, ClientRobot robot)
         {
-            switch (streamMessage.Robot.Orientation)
+            switch (robot.Orientation)
             {
                 case Orientation.East:
-                    if (position.Y > 0)
-                        TurnRight(streamMessage);
+                    if (robot.Position.Y > 0)
+                        TurnRight(streamMessage, robot);
                     else
-                        TurnLeft(streamMessage);
+                        TurnLeft(streamMessage, robot);
                     break;
                 case Orientation.South:
-                    if (position.Y < 0)
-                        TurnAbout(streamMessage);
+                    if (robot.Position.Y < 0)
+                        TurnAbout(streamMessage, robot);
                     break;
                 case Orientation.West:
-                    if (position.Y > 0) TurnLeft(streamMessage);
+                    if (robot.Position.Y > 0) TurnLeft(streamMessage, robot);
                     else
-                        TurnRight(streamMessage);
+                        TurnRight(streamMessage, robot);
                     break;
-               
+
                 case Orientation.North:
-                    if (position.Y > 0)
-                        TurnAbout(streamMessage);
+                    if (robot.Position.Y > 0)
+                        TurnAbout(streamMessage, robot);
                     break;
             }
         }
 
-        private static void TurnToYAxis(StreamMessage streamMessage, Position position)
+        private static void TurnToYAxis(StreamMessage streamMessage, ClientRobot robot)
         {
-            switch (streamMessage.Robot.Orientation)
+            switch (robot.Orientation)
             {
                 case Orientation.East:
-                    if (position.X > 0)
-                        TurnAbout(streamMessage);
+                    if (robot.Position.X > 0)
+                        TurnAbout(streamMessage, robot);
                     break;
                 case Orientation.South:
-                    if (position.X < 0)
-                        TurnLeft(streamMessage);
+                    if (robot.Position.X < 0)
+                        TurnLeft(streamMessage, robot);
                     else
-                        TurnRight(streamMessage);
+                        TurnRight(streamMessage, robot);
                     break;
                 case Orientation.West:
-                    if (position.X > 0) TurnAbout(streamMessage);
+                    if (robot.Position.X > 0) TurnAbout(streamMessage, robot);
                     break;
                 case Orientation.North:
-                    if (position.X < 0)
-                        TurnRight(streamMessage);
+                    if (robot.Position.X < 0)
+                        TurnRight(streamMessage, robot);
                     else
-                        TurnLeft(streamMessage);
+                        TurnLeft(streamMessage, robot);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private static void GetToXAxis(StreamMessage streamMessage, Position position)
+        private static void GetToXAxis(StreamMessage streamMessage, ClientRobot robot)
         {
-            if (position.Y == 0) return;
+            if (robot.Position.Y == 0) return;
 
-            for (int i = 0; i < Math.Abs(position.Y); i++)
-                Move(streamMessage);
+            while (robot.Position.Y != 0)
+            {
+                Move(streamMessage, robot);
+            }
         }
 
-        private static void GetToGoal(StreamMessage streamMessage, Position position)
+        private static void GetToYAxis(StreamMessage streamMessage, ClientRobot robot)
         {
-            if (position.X == 0) return;
+            if (robot.Position.X == 0) return;
 
-            for (int i = 0; i < Math.Abs(position.X); i++)
-                Move(streamMessage);
+            while (robot.Position.X != 0)
+                Move(streamMessage, robot);
 
-            position = GetPosition(streamMessage);
-            Console.WriteLine(position);
+            GetPositionSetToRobot(streamMessage, robot);
+
+            Console.WriteLine(robot.Position);
         }
 
         private static int GetPositionInt(string position)
@@ -121,38 +125,39 @@ namespace TCPServer.Services
             return positionInt;
         }
 
-        private static void Move(StreamMessage streamMessage)
+        private static void Move(StreamMessage streamMessage, ClientRobot robot)
         {
             MessageService.SendMoveChallenge(streamMessage);
-            GetConfirm(streamMessage);
-            streamMessage.Robot.MoveCoun++;
+            GetConfirm(streamMessage, robot);
+            robot.MoveCoun++;
+            GetPositionSetToRobot(streamMessage, robot);
         }
 
-        private static void TurnAbout(StreamMessage streamMessage)
+        private static void TurnAbout(StreamMessage streamMessage, ClientRobot robot)
         {
-            TurnRight(streamMessage);
-            TurnRight(streamMessage);
+            TurnRight(streamMessage, robot);
+            TurnRight(streamMessage, robot);
         }
 
-        private static void TurnRight(StreamMessage streamMessage)
+        private static void TurnRight(StreamMessage streamMessage, ClientRobot robot)
         {
             MessageService.SendTurnRightChallenge(streamMessage);
-            GetConfirm(streamMessage);
-            streamMessage.Robot.TurnRight();
+            GetConfirm(streamMessage, robot);
+            robot.TurnRight();
         }
 
-        private static void TurnLeft(StreamMessage streamMessage)
+        private static void TurnLeft(StreamMessage streamMessage, ClientRobot robot)
         {
             MessageService.SendTurnLeftChallenge(streamMessage);
-            GetConfirm(streamMessage);
-            streamMessage.Robot.TurnLeft();
+            GetConfirm(streamMessage, robot);
+            robot.TurnLeft();
         }
 
-        private static void GetConfirm(StreamMessage streamMessage)
+        private static void GetConfirm(StreamMessage streamMessage, ClientRobot robot)
         {
             if (IsConfirmMessageValid(streamMessage)) return;
 
-            MessageService.SendSyntaxError(streamMessage);
+            MessageService.SendSyntaxError(streamMessage, robot);
         }
 
         private static bool IsConfirmMessageValid(StreamMessage streamMessage)

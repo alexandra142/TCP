@@ -7,7 +7,7 @@ namespace Model
     {
         public TcpClient TcpClient;
         public bool IsClosed;
-
+        public Position Position { get; set; }
         private Orientation _orientation;
 
         public Orientation Orientation

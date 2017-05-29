@@ -4,7 +4,8 @@
     {
         public static bool IsTooLong(StreamMessage streamMessage, int maxLength)
         {
-            return streamMessage.AcceptedMessage.AsciiValues.Count > (maxLength- Constants.SplitterAscii.Length);
+            var x = streamMessage.AcceptedMessage.AsciiValues.Count > maxLength;
+            return x;
         }
     }
 }

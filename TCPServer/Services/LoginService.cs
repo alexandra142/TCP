@@ -2,37 +2,46 @@
 using System.Collections.Generic;
 using System.Linq;
 using Messenger;
+using Model;
 
 namespace TCPServer.Services
 {
     public static class LoginService
     {
-        public static void TryLogIn(StreamMessage streamMessage)
+        public static bool TryLogIn(StreamMessage streamMessage, ClientRobot robot)
         {
-            GetUserName(streamMessage);
+            GetUserName(streamMessage, robot);
 
-            if(streamMessage.ClientClosed) return;
+            if (streamMessage.ClientClosed) return false;
 
-            string expectedPassword = GetExpectedPassword(streamMessage); 
+            string expectedPassword = GetExpectedPassword(streamMessage);
 
-            GetPassword(streamMessage);
+            GetPassword(streamMessage, robot);
 
-            if (streamMessage.ClientClosed) return;
+            if (streamMessage.ClientClosed) return false;
 
-            SendRespond(expectedPassword,streamMessage);
+            if (LoginIsValid(expectedPassword, streamMessage))
+            {
+                MessageService.SendOk(streamMessage);
+                return true;
+            }
+
+            MessageService.SendLoginFailed(streamMessage);
+
+            return false;
         }
 
-        private static void GetUserName(StreamMessage streamMessage)
+        private static void GetUserName(StreamMessage streamMessage, ClientRobot robot)
         {
             MessageService.SendLoginChallenge(streamMessage);
-            ValidUserName(streamMessage);
+            ValidUserName(streamMessage, robot);
         }
 
-        private static void ValidUserName(StreamMessage streamMessage)
+        private static void ValidUserName(StreamMessage streamMessage, ClientRobot robot)
         {
             if (UserNameIsValid(streamMessage)) return;
 
-            MessageService.SendSyntaxError(streamMessage);
+            MessageService.SendSyntaxError(streamMessage, robot);
         }
 
         private static bool UserNameIsValid(StreamMessage streamMessage)
@@ -47,30 +56,24 @@ namespace TCPServer.Services
 
         private static string GetExpectedPassword(StreamMessage streamMessage)
         {
-            var asciiSum = streamMessage.AcceptedMessage.AsciiValues.Sum()- Constants.SplitterAscii.Sum();
+            var asciiSum = streamMessage.AcceptedMessage.AsciiValues.Sum() - Constants.SplitterAscii.Sum();
             return asciiSum.ToString();
         }
 
-        private static void GetPassword(StreamMessage streamMessage)
+        private static void GetPassword(StreamMessage streamMessage, ClientRobot robot)
         {
             MessageService.SendPasswordChallenge(streamMessage);
-            ValidPassword(streamMessage);
+            ValidPassword(streamMessage, robot);
         }
 
-        private static void ValidPassword(StreamMessage streamMessage)
+        private static void ValidPassword(StreamMessage streamMessage, ClientRobot robot)
         {
-            if(PasswordIsValid(streamMessage)) return;
+            if (PasswordIsValid(streamMessage)) return;
 
-            MessageService.SendSyntaxError(streamMessage);
+            MessageService.SendSyntaxError(streamMessage, robot);
         }
 
-        private static void SendRespond(string expectedPassword, StreamMessage streamMessage)
-        {
-            if (LoginIsValid(expectedPassword, streamMessage)) MessageService.SendOk(streamMessage);
-            else MessageService.SendLoginFailed(streamMessage);
-        }
-
-        private static bool LoginIsValid(string expectedPassword, StreamMessage streamMessage)
+       private static bool LoginIsValid(string expectedPassword, StreamMessage streamMessage)
         {
             return expectedPassword == streamMessage.AcceptedMessage.DecodedData;
         }

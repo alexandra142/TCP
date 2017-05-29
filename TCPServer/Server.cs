@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Messenger;
+using Model;
 using TCPServer.Services;
 
 namespace TCPServer
@@ -50,18 +51,15 @@ namespace TCPServer
         {
             TcpClient client = (TcpClient)obj;
             StreamMessage streamMessage = new StreamMessage(client);
-
+            ClientRobot robot = new ClientRobot { TcpClient = client };
             try
             {
                 if (!client.Connected) return;
+                if (!LoginService.TryLogIn(streamMessage, robot)) return;
 
-                StartCommunication(streamMessage);
-                if (streamMessage.ClientClosed) return;
+                if (!MoveService.TryMoveToGoal(streamMessage, robot)) return;
 
-                Move(streamMessage);
-                if (streamMessage.ClientClosed) return;
-
-                PickUpService.TryPickUp(streamMessage);
+                PickUpService.TryPickUp(streamMessage, robot);
             }
             catch (IOException ioe)
             {
@@ -73,13 +71,13 @@ namespace TCPServer
             }
             finally
             {
-                streamMessage.CloseClient();
+                streamMessage.CloseClient(robot);
             }
         }
 
         private void Move(StreamMessage streamMessage)
         {
-            MoveService.TryMoveToGoal(streamMessage);
+
         }
 
         private bool NetworkAvailable()
@@ -89,7 +87,6 @@ namespace TCPServer
 
         private void StartCommunication(StreamMessage streamMessage)
         {
-            LoginService.TryLogIn(streamMessage);
         }
 
         //private IPAddress GetLocalIPAddress()
