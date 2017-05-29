@@ -54,11 +54,6 @@ namespace TCPServer
             try
             {
                 Communicate(streamMessage, robot);
-                while (!robot.IsClosed)
-                {
-                    streamMessage.ReadMessage("something: ");
-                }
-
             }
             catch (IOException ioe)
             {

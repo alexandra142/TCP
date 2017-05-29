@@ -31,7 +31,7 @@ namespace Messenger
         [Description("301 SYNTAX ERROR")]
         SERVER_SYNTAX_ERROR,
 
-        [Description("302 LOGIC ERROR\r\n")]
+        [Description("302 LOGIC ERROR")]
         SERVER_LOGIC_ERROR
     }
 }

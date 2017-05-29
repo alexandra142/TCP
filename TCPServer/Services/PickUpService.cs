@@ -20,7 +20,7 @@ namespace TCPServer.Services
             if (MessageValidator.IsRecharging(streamMessage))
             {
                 RechargingService.WaitForRecharging(streamMessage, robot);
-                streamMessage.ReadMessage("Accepted key", MaxLenths.Password);
+                streamMessage.ReadMessage("Accepted key", MaxLenths.Message);
                 IsKeyValid(streamMessage, robot);
             }
             if (MessageValidator.IsTooLong(streamMessage, MaxLenths.Login)) return false;
