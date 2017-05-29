@@ -34,28 +34,28 @@ namespace Messenger
         {
             string passwordChallenge = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_PASSWORD);
             streamMessage.WriteMessage(passwordChallenge);
-            streamMessage.ReadMessage("Accepted Password", MaxLenths.Password);
+            streamMessage.ReadMessage("Accepted Password");
         }
 
         public static void SendMoveChallenge(StreamMessage streamMessage)
         {
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_MOVE);
             streamMessage.WriteMessage(message);
-            streamMessage.ReadMessage("Moving", MaxLenths.Confirm);
+            streamMessage.ReadMessage("Moving");
         }
 
         public static void SendTurnRightChallenge(StreamMessage streamMessage)
         {
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_TURN_RIGHT);
             streamMessage.WriteMessage(message);
-            streamMessage.ReadMessage("Turn right", MaxLenths.Confirm);
+            streamMessage.ReadMessage("Turn right");
         }
 
         public static void SendTurnLeftChallenge(StreamMessage streamMessage)
         {
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_TURN_LEFT);
             streamMessage.WriteMessage(message);
-            streamMessage.ReadMessage("Turn left", MaxLenths.Confirm);
+            streamMessage.ReadMessage("Turn left");
         }
 
         public static void SendPickUpChallenge(StreamMessage streamMessage)
@@ -63,6 +63,13 @@ namespace Messenger
             string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_PICK_UP);
             streamMessage.WriteMessage(message);
             streamMessage.ReadMessage("Pick up", MaxLenths.Message);
+        }
+
+        public static void SendLogicError(StreamMessage streamMessage, ClientRobot robot)
+        {
+            string message = ServerMessageFactory.Create(ServerMessagesCodes.SERVER_LOGIC_ERROR);
+            streamMessage.WriteMessage(message);
+            robot.Close();
         }
     }
 }

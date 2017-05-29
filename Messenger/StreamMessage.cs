@@ -25,12 +25,13 @@ namespace Messenger
             StreamWriter.Flush();
         }
 
-        public void ReadMessage(string writeConsoleMessage, int maxLength)
+        public void ReadMessage(string writeConsoleMessage, int maxLength = 0)
         {
             ClearOldValues();
+            maxLength = maxLength != 0 ? maxLength : MaxLenths.Recharging;
             MessageSplitter splitter = new MessageSplitter();
             int charCount = 0;
-            while (!splitter.Splitted && charCount< maxLength)
+            while (!splitter.Splitted && charCount < maxLength)
             {
                 charCount++;
                 int value = StreamReader.Read();

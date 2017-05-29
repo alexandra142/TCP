@@ -44,6 +44,8 @@ namespace TCPServer.Services
 
         private static void TurnToXAxis(StreamMessage streamMessage, ClientRobot robot)
         {
+            if (robot.IsClosed || robot.Position.Y == 0) return;
+
             switch (robot.Orientation)
             {
                 case Orientation.East:
@@ -201,6 +203,13 @@ namespace TCPServer.Services
 
         private static void GetConfirm(StreamMessage streamMessage, ClientRobot robot)
         {
+            if (MessageValidator.IsRecharging(streamMessage))
+            {
+                RechargingService.WaitForRecharging(streamMessage, robot);
+                streamMessage.ReadMessage("Accepted confirm", MaxLenths.Confirm);
+                GetConfirm(streamMessage, robot);
+            }
+
             if (IsConfirmMessageValid(streamMessage)) return;
 
             MessageService.SendSyntaxError(streamMessage, robot);
@@ -211,7 +220,16 @@ namespace TCPServer.Services
             if (MessageValidator.IsTooLong(streamMessage, MaxLenths.Confirm))
                 return false;
 
-            return HasRightFormat(streamMessage);
+            if (HasRightFormat(streamMessage)) return true;
+            return IsRecharging(streamMessage);
+        }
+
+        private static bool IsRecharging(StreamMessage streamMessage)
+        {
+            Console.WriteLine("Recharging");
+            if (streamMessage.AcceptedMessage.DecodedData == ClientMessageCodes.CLIENT_RECHARGING.GetEnumDescription())
+                return true;
+            return false;
         }
 
         private static bool HasRightFormat(StreamMessage streamMessage)

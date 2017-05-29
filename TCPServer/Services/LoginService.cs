@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Messenger;
 using Model;
@@ -10,25 +11,28 @@ namespace TCPServer.Services
     {
         public static bool TryLogIn(StreamMessage streamMessage, ClientRobot robot)
         {
-            GetUserName(streamMessage, robot);
-
-            if (streamMessage.ClientClosed) return false;
-
-            string expectedPassword = GetExpectedPassword(streamMessage);
-
-            GetPassword(streamMessage, robot);
-
-            if (streamMessage.ClientClosed) return false;
-
-            if (LoginIsValid(expectedPassword, streamMessage))
+            try
             {
-                MessageService.SendOk(streamMessage);
-                return true;
+                GetUserName(streamMessage, robot);
+
+                string expectedPassword = GetExpectedPassword(streamMessage);
+
+                GetPassword(streamMessage, robot);
+
+                if (LoginIsValid(expectedPassword, streamMessage))
+                {
+                    MessageService.SendOk(streamMessage);
+                    return true;
+                }
+
+                MessageService.SendLoginFailed(streamMessage);
+
+                return false;
             }
-
-            MessageService.SendLoginFailed(streamMessage);
-
-            return false;
+            catch (IOException ioe)
+            {
+                return false;
+            }
         }
 
         private static void GetUserName(StreamMessage streamMessage, ClientRobot robot)
@@ -39,6 +43,8 @@ namespace TCPServer.Services
 
         private static void ValidUserName(StreamMessage streamMessage, ClientRobot robot)
         {
+            if (MessageValidator.IsRecharging(streamMessage)) return;
+
             if (UserNameIsValid(streamMessage)) return;
 
             MessageService.SendSyntaxError(streamMessage, robot);
@@ -68,12 +74,18 @@ namespace TCPServer.Services
 
         private static void ValidPassword(StreamMessage streamMessage, ClientRobot robot)
         {
+            if (MessageValidator.IsRecharging(streamMessage))
+            {
+                RechargingService.WaitForRecharging(streamMessage, robot);
+                streamMessage.ReadMessage("Accepted password", MaxLenths.Password);
+                ValidPassword(streamMessage, robot);
+            }
             if (PasswordIsValid(streamMessage)) return;
 
             MessageService.SendSyntaxError(streamMessage, robot);
         }
 
-       private static bool LoginIsValid(string expectedPassword, StreamMessage streamMessage)
+        private static bool LoginIsValid(string expectedPassword, StreamMessage streamMessage)
         {
             return expectedPassword == streamMessage.AcceptedMessage.DecodedData;
         }

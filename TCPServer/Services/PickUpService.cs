@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Messenger;
 using Model;
 
@@ -14,14 +12,20 @@ namespace TCPServer.Services
         {
             GetKey(streamMessage);
 
-            if (IsKeyValid(streamMessage))
+            if (IsKeyValid(streamMessage, robot))
                 MessageService.SendOk(streamMessage);
             else
                 MessageService.SendSyntaxError(streamMessage, robot);
         }
 
-        private static bool IsKeyValid(StreamMessage streamMessage)
+        private static bool IsKeyValid(StreamMessage streamMessage, ClientRobot robot)
         {
+            if (MessageValidator.IsRecharging(streamMessage))
+            {
+                RechargingService.WaitForRecharging(streamMessage, robot);
+                streamMessage.ReadMessage("Accepted key", MaxLenths.Password);
+                IsKeyValid(streamMessage, robot);
+            }
             if (MessageValidator.IsTooLong(streamMessage, MaxLenths.Login)) return false;
             return true;
         }

@@ -11,14 +11,13 @@ namespace TCPServer
 {
     public class Server
     {
-        private const int MilisecondTimeout = 1000;
         private readonly TcpListener _server;
 
         public Server(int port)
         {
             _server = new TcpListener(IPAddress.Any, port);
-            _server.Server.ReceiveTimeout = MilisecondTimeout;
-            _server.Server.SendTimeout = MilisecondTimeout;
+            _server.Server.ReceiveTimeout = Constants.TIMEOUT;
+            _server.Server.SendTimeout = Constants.TIMEOUT;
             StartServer();
 
             LoopClients();
