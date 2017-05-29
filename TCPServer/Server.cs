@@ -57,7 +57,8 @@ namespace TCPServer
                 if (!client.Connected) return;
                 if (!LoginService.TryLogIn(streamMessage, robot)) return;
 
-                if (!MoveService.TryMoveToGoal(streamMessage, robot)) return;
+                MoveService.TryMoveToGoal(streamMessage, robot);
+                if (robot.IsClosed) return;
 
                 PickUpService.TryPickUp(streamMessage, robot);
             }

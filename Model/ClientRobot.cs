@@ -19,20 +19,7 @@ namespace Model
                 Console.WriteLine($"Recognized orientation : {Orientation}");
             }
         }
-
-        public int MoveCoun
-        {
-            get { return _moveCount; }
-            set
-            {
-                if (IsClosed) return;
-                _moveCount = value;
-                if (_moveCount >= MaxMoves)
-                    Close();
-
-            }
-        }
-
+     
         public void Close()
         {
             Console.Write($"Client {TcpClient.Client.RemoteEndPoint} closed");
@@ -40,9 +27,6 @@ namespace Model
             TcpClient.Client.Close();
             IsClosed = true;
         }
-
-        private int _moveCount;
-        private const int MaxMoves = 100;
 
         public void TurnRight()
         {
@@ -58,6 +42,21 @@ namespace Model
                 Orientation = Orientation.East;
             else
                 Orientation++;
+        }
+
+        public bool IsCloserToXAxis(Position oldPosition)
+        {
+            return oldPosition.AbsY > Position.AbsY;
+        }
+
+        public bool HasntMoved(Position oldPosition)
+        {
+           return Equals(oldPosition, Position);
+        }
+
+        public bool IsCloserToYAxis(Position oldPosition)
+        {
+            return oldPosition.AbsX > Position.AbsX;
         }
     }
 }

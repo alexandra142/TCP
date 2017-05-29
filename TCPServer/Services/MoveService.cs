@@ -6,15 +6,16 @@ namespace TCPServer.Services
 {
     public static class MoveService
     {
-        public static bool TryMoveToGoal(StreamMessage streamMessage, ClientRobot robot)
+        public static void TryMoveToGoal(StreamMessage streamMessage, ClientRobot robot)
         {
             SetOrientationToRobot(streamMessage, robot);
-            TurnToXAxis(streamMessage, robot);
-            GetToXAxis(streamMessage, robot);
-            TurnToYAxis(streamMessage, robot);
-            GetToYAxis(streamMessage, robot);
-
-            return robot.Position.X == 0 && robot.Position.Y == 0;
+            while (robot.Position.X != 0 || robot.Position.Y != 0)
+            {
+                TurnToXAxis(streamMessage, robot);
+                GetToXAxis(streamMessage, robot);
+                TurnToYAxis(streamMessage, robot);
+                GetToYAxis(streamMessage, robot);
+            }
         }
 
         private static void SetOrientationToRobot(StreamMessage streamMessage, ClientRobot robot)
@@ -31,6 +32,7 @@ namespace TCPServer.Services
         private static Position GetPositionSetToRobot(StreamMessage streamMessage, ClientRobot robot)
         {
             var data = streamMessage.AcceptedMessage.DecodedData.Split(' ');
+            if (!HasRightFormat(streamMessage)) return robot.Position;
 
             int x = GetPositionInt(data[1]);
             int y = GetPositionInt(data[2]);
@@ -101,7 +103,16 @@ namespace TCPServer.Services
 
             while (robot.Position.Y != 0)
             {
+                var oldPosition = robot.Position;
                 Move(streamMessage, robot);
+                if (robot.IsCloserToXAxis(oldPosition)) continue;
+                if (robot.HasntMoved(oldPosition)) continue;
+                if (robot.Position.X != oldPosition.X)
+                {
+                    PositionXChanged(streamMessage, robot, oldPosition);
+                    continue;
+                }
+                TurnAbout(streamMessage, robot);
             }
         }
 
@@ -110,11 +121,44 @@ namespace TCPServer.Services
             if (robot.Position.X == 0) return;
 
             while (robot.Position.X != 0)
+            {
+                var oldPosition = robot.Position;
                 Move(streamMessage, robot);
-
-            GetPositionSetToRobot(streamMessage, robot);
+                if (robot.IsCloserToYAxis(oldPosition)) continue;
+                if (robot.HasntMoved(oldPosition)) continue;
+                if (robot.Position.Y != oldPosition.Y)
+                {
+                    PositionYChanged(streamMessage, robot);
+                    continue;
+                }
+                TurnAbout(streamMessage, robot);
+            }
 
             Console.WriteLine(robot.Position);
+        }
+
+        private static void PositionYChanged(StreamMessage streamMessage, ClientRobot robot)
+        {
+            TurnAbout(streamMessage, robot);
+            Move(streamMessage, robot);
+        }
+
+        private static void PositionXChanged(StreamMessage streamMessage, ClientRobot robot, Position oldPosition)
+        {
+            if (robot.IsCloserToYAxis(oldPosition))
+            {
+                if (robot.Position.X >= 0)
+                    TurnLeft(streamMessage, robot);
+                else
+                    TurnRight(streamMessage, robot);
+            }
+            else
+            {
+                if (robot.Position.X >= 0)
+                    TurnRight(streamMessage, robot);
+                else
+                    TurnLeft(streamMessage, robot);
+            }
         }
 
         private static int GetPositionInt(string position)
@@ -129,8 +173,10 @@ namespace TCPServer.Services
         {
             MessageService.SendMoveChallenge(streamMessage);
             GetConfirm(streamMessage, robot);
-            robot.MoveCoun++;
+            var oldPosition = robot.Position;
             GetPositionSetToRobot(streamMessage, robot);
+            if (robot.HasntMoved(oldPosition))
+                Move(streamMessage, robot);
         }
 
         private static void TurnAbout(StreamMessage streamMessage, ClientRobot robot)
