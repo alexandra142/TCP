@@ -27,16 +27,21 @@ namespace Messenger
             StreamWriter.Flush();
         }
 
-        public void ReadMessage(string writeConsoleMessage)
+        public void ReadMessage(string writeConsoleMessage, int maxLength)
         {
             ClearOldValues();
             MessageSplitter splitter = new MessageSplitter();
-            while (!splitter.Splitted)
+            int charCount = 0;
+            while (!splitter.Splitted && charCount< maxLength)
             {
+                charCount++;
                 int value = StreamReader.Read();
                 splitter.RecognizeSpliter(value);
                 AcceptedMessage.AsciiValues.Add(value);
             }
+            if (!splitter.Splitted && charCount == maxLength)
+                AcceptedMessage.AsciiValues.Add(0);
+
             AcceptedMessage.Decode(writeConsoleMessage);
         }
 
