@@ -49,7 +49,6 @@
     <Compile Include="MessageSplitter.cs" />
     <Compile Include="MessageValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerMessageFactory.cs" />
     <Compile Include="ClientMessageCodes.cs" />
     <Compile Include="ServerMessageCodes.cs" />
     <Compile Include="StreamMessage.cs" />
